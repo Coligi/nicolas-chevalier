@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1556710462 source:c:\users\nicolas\desktop\epsi\c++\ladders & snakes\main.cpp
+	<iostream>
+	<cstdlib>
+	<time.h>
+	<math.h>
+	<new>
+
