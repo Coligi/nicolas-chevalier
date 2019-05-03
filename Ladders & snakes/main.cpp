@@ -5,27 +5,16 @@
 #include <new>
 using namespace std;
 
-bool verif(int nombre,int *tableDeVerif,int nbSL);
-int lanceDe();
-
-
 class Ladder{
 private:
-    int numero;
     int debutL;
     int finL;
 public:
-    void setNumero(int num){
-        this -> numero = num;
-    }
     void setDebutL(int debut){
         this -> debutL = debut;
     }
     void setFinL(int fin){
         this -> finL = fin;
-    }
-    int getNumero(){
-        return this->numero;
     }
     int getDebutL(){
         return this->debutL;
@@ -35,12 +24,11 @@ public:
     }
     Ladder(){
     //echelles
-        int ran = rand()% 81 + 21; //un haut d'echelle est forcement entre 81 et 2 ici.
+    //un haut d'echelle est forcement entre 81 et 2 ici.
+        int ran = rand()% 81 + 1;
         this -> debutL = ran;
-        while (ran==this -> debutL || (ran > 99 || ran < 1)){
-            int maxi=this -> debutL+35;
-            int mini=this -> debutL+10;
-            ran = rand()% maxi+mini;
+        while (ran==this -> debutL || (ran > 99 || ran<this->debutL) || this->debutL+10>ran || ran>this->debutL+35){
+            ran = rand()% 99+1;
         }
         this -> finL =ran;
     }
@@ -49,21 +37,14 @@ public:
 
 class Snake{
 private:
-    int numero;
     int debutS;
     int finS;
 public:
-    void setNumero(int num){
-        this -> numero = num;
-    }
     void setDebutS(int debut){
         this -> debutS = debut;
     }
     void setFinS(int fin){
         this -> finS = fin;
-    }
-    int getNumero(){
-        return this->numero;
     }
     int getDebutS(){
         return this->debutS;
@@ -73,12 +54,13 @@ public:
     }
     Snake(){
     //serpent
-        int ran = rand()% 99 + 11; //un haut de serpent est forcement entre 99 et 11 ici.
+    //un haut de serpent est forcement entre 99 et 11 ici.
+        int ran=0;
+        while(ran==0 || ran >99 || ran < 11)
+            ran = rand()% 99 + 1;
         this -> debutS = ran;
-        while (ran==this -> debutS || (ran > 99 || ran < 1)){
-            int maxi=this -> debutS-10;
-            int mini=this -> debutS-35;
-            ran = rand()% maxi+mini;
+        while (ran==this -> debutS || (ran>this->debutS || ran < 1) || this->debutS-10<ran || ran<this->debutS-35){
+            ran = rand()% 89+1;
         }
         this -> finS =ran;
     }
@@ -86,7 +68,7 @@ public:
 
 class Joueur{
 //DOCUMENTATION
-//La classe joueur permet de créer et de faire ce déplacer le joueur.
+//La classe joueur permet de créer, de donner un nom, de faire gagner et se déplacer le joueur.
 private:
     int position;
 public:
@@ -94,19 +76,17 @@ public:
         return this->position;
     }
     void setposition(int resultat){
-        this -> position+=resultat;
+        this -> position=resultat;
     }
     void deplacement(){
-        setposition(lanceDe());
+        this-> position+=lanceDe();
     }
     bool gagne(int result){
+        bool rep=false;
         if (result>=100){
-            return true;
+            rep=true;
         }
-        else{
-            return false;
-        }
-
+        return rep;
     }
     int lanceDe(){
     //DOCUMENTATION
@@ -121,27 +101,25 @@ public:
 int main()
 {
 
-
-    cout << "combien voulez vous d'echelles ?(si entree negative ou superieure a 24 :5)" << endl;
-    int nbL=5;
+    //Création des échelles
+    cout << "combien voulez vous d'echelles ?(si votre choix est negatif ou superieure a 24, la valeur par defaut sera :7)" << endl;
+    int nbL=7;
     cin >> nbL;
     if (nbL<0 || nbL>24){
-        nbL=5;
+        cout << "!! erreur !! ->7 echelles" << endl;
+        nbL=7;
     }
 
-    cout << "combien voulez vous de serpents ?(si entree negative ou superieure a 24 :5)" << endl;
-    int nbS=5;
+    //Création des serpents
+    cout << "combien voulez vous de serpents ?(si votre choix est negatif ou superieure a 24, la valeur par defaut sera :9)" << endl;
+    int nbS=9;
     cin >> nbS;
     if (nbS<0 || nbS>24){
-        nbS=5;
+        cout << "!! erreur !! ->9 serpents" << endl;
+        nbS=9;
     }
 
-    int nbspe=(nbS+nbL)*2;
-
-    int *tabDesSpecial[nbspe];
-    for (int o=0;o>nbspe;o++){
-        tabDesSpecial[o]==0;
-    }
+    //Création des joueurs
     int nbjoueur = 0;
     cout << "combien il y a t'il de joueurs ?" << endl;
     cin >> nbjoueur;
@@ -155,35 +133,43 @@ int main()
     bool victoire=false;
 
     //jeu
+    int tour =0;
     do{
-        for(int i=0;i>nbjoueur;i++){
+        tour+=1;
+
+        cout << "tour de jeu n " << tour << endl;
+        for(int i=0;i<nbjoueur;i++){
             joueur[i].deplacement();
         }
-
-        for(int i=0;i>nbS;i++){
-            for(int j=0;j>nbjoueur;j++){
+        for(int i=0;i<nbS;i++){
+            for(int j=0;j<nbjoueur;j++){
                 if (snakes[i].getDebutS()==joueur[j].getposition()){
                     joueur[j].setposition(snakes[i].getFinS());
+                    cout << "le joueur n " << j+1 << " tombe a cause d'un serpent.."<<endl;
                 }
             }
         }
 
-        for(int i=0;i>nbL;i++){
-            for(int j=0;j>nbjoueur;j++){
+        for(int i=0;i<nbL;i++){
+            for(int j=0;j<nbjoueur;j++){
                 if (ladders[i].getDebutL()==joueur[j].getposition()){
                     joueur[j].setposition(ladders[i].getFinL());
+                    cout << "le joueur n " << j+1 << " monte tout en haut d'une echelle !"<<endl;
                 }
             }
         }
-        for(int i=0;i>nbjoueur;i++){
-            if (joueur[i].gagne(joueur[i].getposition()==true)){
+        for (int i=0;i<nbjoueur;i++){
+            cout << "le Joueur n " << i+1 << " est a la case :" << joueur[i].getposition()<<endl;
+        }
+        for(int i=0;i<nbjoueur;i++){
+                int place=joueur[i].getposition();
+            if ((joueur[i].gagne(place))==true){
                 victoire=true;
+                cout << "Le joueur n "<< i+1 << " a gagne !" << endl;
                 break;
             }
         }
     }while(victoire==false);
-    cout << "Le joueur"<< endl;
-    cout << "Hello world!" << endl;
     return 0;
 }
 
